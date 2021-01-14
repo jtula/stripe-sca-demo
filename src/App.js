@@ -1,16 +1,18 @@
 import React, { Suspense } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-import { UserContextProvider } from "context/UserContext";
-import SignIn from "pages/SignIn";
-import SignUp from "page/SignUp";
-import "./App.css";
+import { UserContextProvider } from "src/context/UserContext";
+import SignIn from "src/pages/SignIn";
+import SignUp from "src/pages/SignUp";
+import Header from "src/components/Header";
+import "bootstrap/dist/css/bootstrap.css";
 
 const App = () => {
   return (
     <UserContextProvider>
       <BrowserRouter>
-        <div className="App">
+        <div className="container">
           <Suspense fallback={null}>
+            <Header />
             <Switch>
               <Route path="/signin">
                 <SignIn />
