@@ -1,10 +1,9 @@
 import { useRouteMatch, Link } from "react-router-dom";
-import useUser from "hooks/useUser";
+import useUser from "src/hooks/useUser";
 
 const Header = () => {
   const { isLogged, logout } = useUser();
-  const [match] = useRouteMatch("/signin");
-
+  const match = useRouteMatch("/signin");
   const handleLogout = (event) => {
     event.preventDefault();
     logout();
@@ -14,12 +13,12 @@ const Header = () => {
     <header>
       {match ? null : isLogged ? (
         <Link to="/logout" onClick={handleLogout}>
-          Salir
+          Logout
         </Link>
       ) : (
         <>
-          <Link to="/signin"></Link>
-          <Link to="/signup"></Link>
+          <Link to="/signin">Sign In</Link>
+          <Link to="/signup">Sign Up</Link>
         </>
       )}
     </header>

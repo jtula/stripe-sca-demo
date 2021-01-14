@@ -1,5 +1,7 @@
-const SignIn = () => {
-  return "SigIn Page";
+import SignIn from "src/components/SignIn";
+
+const SignInPage = ({ onLogin }) => {
+  return <SignIn />;
 };
 
-export default SignIn;
+export default SignInPage;

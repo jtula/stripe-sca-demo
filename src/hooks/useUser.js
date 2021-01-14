@@ -1,23 +1,26 @@
 import { useCallback, useContext, useState } from "react";
-import Context from "context/UserContext";
-import { login } from "services/auth";
+import UserContext from "src/context/UserContext";
+import { login as loginService } from "src/services/auth";
 
 export default function useUser() {
-  const { accessToken, setAccessToken } = useContext(Context);
-  const [state, setState] = useState({ loading: false, error: false });
+  const { accessToken, setAccessToken } = useContext(UserContext);
+  const [loadingUser, setLoadingUser] = useState(false);
+  const [userError, setUserError] = useState(false);
 
-  const userLogin = useCallback(
+  const login = useCallback(
     ({ username, password }) => {
-      setState({ loading: true, error: false });
-      login({ username, password })
+      setLoadingUser(true);
+      loginService({ username, password })
         .then((accessToken) => {
           window.sessionStorage.setItem("accessToken", accessToken);
-          setState({ loading: false, error: false });
+          setLoadingUser(false);
+          setUserError(false);
           setAccessToken(accessToken);
         })
         .catch((err) => {
           window.sessionStorage.removeItem("accessToken");
-          setState({ loading: false, error: true });
+          setLoadingUser(false);
+          setUserError(true);
           console.error(err);
         });
     },
@@ -30,10 +33,10 @@ export default function useUser() {
   }, [setAccessToken]);
 
   return {
-    isLogged: Boolean(accessToken),
-    isLoginLoading: state.loading,
-    hasLoginError: state.error,
-    userLogin,
+    userLogged: Boolean(accessToken),
+    loadingUser,
+    userError,
+    login,
     logout,
   };
 }
