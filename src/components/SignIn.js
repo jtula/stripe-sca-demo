@@ -35,7 +35,6 @@ const SignIn = ({ onLogin }) => {
                 <label>
                   Username
                   <input
-                    placeholder="username"
                     onChange={(e) => setUsername(e.target.value)}
                     value={username}
                   />
@@ -45,7 +44,6 @@ const SignIn = ({ onLogin }) => {
                   Password
                   <input
                     type="password"
-                    placeholder="password"
                     onChange={(e) => setPassword(e.target.value)}
                     value={password}
                   />
