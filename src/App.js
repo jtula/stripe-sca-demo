@@ -3,8 +3,9 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import { UserContextProvider } from "src/context/UserContext";
 import SignIn from "src/pages/SignIn";
 import SignUp from "src/pages/SignUp";
-import Header from "src/components/Header";
 import "bootstrap/dist/css/bootstrap.css";
+
+const HomePage = React.lazy(() => import("./pages/Home"));
 
 const App = () => {
   return (
@@ -12,8 +13,8 @@ const App = () => {
       <BrowserRouter>
         <div className="container">
           <Suspense fallback={null}>
-            <Header />
             <Switch>
+              <Route component={HomePage} exact={true} path="/" />
               <Route path="/signin">
                 <SignIn />
               </Route>
