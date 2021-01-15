@@ -1,21 +1,21 @@
-const ENDPOINT = "https://xxxx.herokuapp.com";
+const ENDPOINT = "https://apistripetest.herokuapp.com";
 
-const login = ({ username, password }) => {
-  return fetch(`${ENDPOINT}/login`, {
+export const login = ({ email, password }) => {
+  return fetch(`${ENDPOINT}/auth/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ username, password }),
-  }).then((response) => response);
+    body: JSON.stringify({ email, password }),
+  }).then((response) => response.json());
 };
 
-const register = ({ username, password }) => {
-  return fetch(`${ENDPOINT}/register`, {
+export const register = ({ fullName, email, password }) => {
+  return fetch(`${ENDPOINT}/auth/register`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ username, password }),
-  }).then((response) => response);
+    body: JSON.stringify({ fullName, email, password }),
+  }).then((response) => response.json());
 };
