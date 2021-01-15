@@ -1,5 +1,5 @@
 import React, { useReducer, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import { register } from "src/services/auth";
 
 const formReducer = (state, event) => {
@@ -17,6 +17,7 @@ const formReducer = (state, event) => {
   };
 };
 const SignUp = () => {
+  const history = useHistory();
   const [formData, setFormData] = useReducer(formReducer, {});
   const [submitting, setSubmitting] = useState(false);
 
@@ -30,6 +31,7 @@ const SignUp = () => {
         setFormData({
           reset: true,
         });
+        history.push("/signin");
       })
       .catch((error) => {
         setSubmitting(false);
