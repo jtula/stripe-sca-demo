@@ -1,42 +1,50 @@
 import { useCallback, useContext, useState } from "react";
-import UserContext from "src/context/UserContext";
-import { login as loginService } from "src/services/auth";
+import Context from "src/context/UserContext";
+import { login } from "src/services/auth";
 
 export default function useUser() {
-  const { accessToken, setAccessToken } = useContext(UserContext);
+  const { token, setToken, user, setUser } = useContext(Context);
   const [loadingUser, setLoadingUser] = useState(false);
   const [userError, setUserError] = useState(false);
 
-  const login = useCallback(
-    ({ username, password }) => {
+  const loginUser = useCallback(
+    ({ email, password }) => {
       setLoadingUser(true);
-      loginService({ username, password })
-        .then((accessToken) => {
-          window.sessionStorage.setItem("accessToken", accessToken);
+      login({ email, password })
+        .then((response) => {
+          window.sessionStorage.setItem("user", JSON.stringify(response.user));
+          window.sessionStorage.setItem(
+            "token",
+            JSON.stringify(response.token)
+          );
           setLoadingUser(false);
           setUserError(false);
-          setAccessToken(accessToken);
+          setUser(response.user);
+          setToken(response.token);
         })
         .catch((err) => {
-          window.sessionStorage.removeItem("accessToken");
+          window.sessionStorage.removeItem("user");
+          window.sessionStorage.removeItem("token");
           setLoadingUser(false);
           setUserError(true);
-          console.error(err);
         });
     },
-    [setAccessToken]
+    [setUser, setToken]
   );
 
   const logout = useCallback(() => {
-    window.sessionStorage.removeItem("accessToken");
-    setAccessToken(null);
-  }, [setAccessToken]);
+    window.sessionStorage.removeItem("user");
+    window.sessionStorage.removeItem("token");
+    setUser(null);
+    setToken(null);
+  }, [setUser, setToken]);
 
   return {
-    userLogged: Boolean(accessToken),
+    userLogged: Boolean(token),
+    user,
     loadingUser,
     userError,
-    login,
+    loginUser,
     logout,
   };
 }
