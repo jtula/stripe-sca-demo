@@ -4,9 +4,11 @@ const Context = React.createContext({});
 
 export function UserContextProvider({ children }) {
   const [token, setToken] = useState(() =>
-    window.sessionStorage.getItem("token")
+    JSON.parse(window.sessionStorage.getItem("token"))
   );
-  const [user, setUser] = useState(() => window.sessionStorage.getItem("user"));
+  const [user, setUser] = useState(() =>
+    JSON.parse(window.sessionStorage.getItem("user"))
+  );
 
   return (
     <Context.Provider
