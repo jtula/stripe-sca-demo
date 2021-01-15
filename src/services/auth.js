@@ -1,21 +1,9 @@
-const ENDPOINT = "https://apistripetest.herokuapp.com";
+import axios from "src/utils/axios";
 
-export const login = ({ email, password }) => {
-  return fetch(`${ENDPOINT}/auth/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ email, password }),
-  }).then((response) => response.json());
+export const login = (params) => {
+  return axios.post("/auth/login", params).then((response) => response.data);
 };
 
-export const register = ({ fullName, email, password }) => {
-  return fetch(`${ENDPOINT}/auth/register`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ fullName, email, password }),
-  }).then((response) => response.json());
+export const register = (params) => {
+  return axios.post("/auth/register", params).then((response) => response.data);
 };
