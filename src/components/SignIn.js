@@ -1,13 +1,14 @@
 import React, { useState } from "react";
-import { useHistory } from "react-router-dom";
+import { useHistory, Link } from "react-router-dom";
 import useUser from "src/hooks/useUser";
 import { useEffect } from "react";
 
 const SignIn = ({ onLogin }) => {
   const history = useHistory();
-  const [username, setUsername] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { loadingUser, userError, login, userLogged } = useUser();
+  const { userLogged, loadingUser, userError, loginUser } = useUser();
 
   useEffect(() => {
     if (userLogged) {
@@ -18,12 +19,11 @@ const SignIn = ({ onLogin }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    login({ username, password });
+    loginUser({ email, password });
   };
 
   return (
     <>
-      {loadingUser && <strong>Checking credentials...</strong>}
       {!loadingUser && (
         <div className="d-flex justify-content-center mt-5">
           <form className="form" onSubmit={handleSubmit}>
@@ -33,10 +33,10 @@ const SignIn = ({ onLogin }) => {
             >
               <div className="card-body">
                 <label>
-                  Username
+                  Email
                   <input
-                    onChange={(e) => setUsername(e.target.value)}
-                    value={username}
+                    onChange={(e) => setEmail(e.target.value)}
+                    value={email}
                   />
                 </label>
 
@@ -49,15 +49,30 @@ const SignIn = ({ onLogin }) => {
                   />
                 </label>
 
-                <button type="submit" className="btn btn-primary">
-                  Login
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="btn btn-primary"
+                >
+                  {submitting ? (
+                    <span
+                      className="spinner-border spinner-border-sm"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
+                  ) : (
+                    "Login"
+                  )}
                 </button>
+                {userError && "Credentials are invalid"}
+                <div className="d-flex justify-content-end pt-4">
+                  <Link to="/signup">Sign Up</Link>
+                </div>
               </div>
             </div>
           </form>
         </div>
       )}
-      {userError && "Credentials are invalid"}
     </>
   );
 };

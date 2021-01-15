@@ -3,15 +3,18 @@ import React, { useState } from "react";
 const Context = React.createContext({});
 
 export function UserContextProvider({ children }) {
-  const [accessToken, setAccessToken] = useState(() =>
-    window.sessionStorage.getItem("accessToken")
+  const [token, setToken] = useState(() =>
+    window.sessionStorage.getItem("token")
   );
+  const [user, setUser] = useState(() => window.sessionStorage.getItem("user"));
 
   return (
     <Context.Provider
       value={{
-        accessToken,
-        setAccessToken,
+        token,
+        setToken,
+        user,
+        setUser,
       }}
     >
       {children}
