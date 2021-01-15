@@ -12,15 +12,15 @@ export default function useUser() {
       setLoadingUser(true);
       login({ email, password })
         .then((response) => {
+          setLoadingUser(false);
+          setUserError(false);
+          setUser(response.user);
+          setToken(response.token);
           window.sessionStorage.setItem("user", JSON.stringify(response.user));
           window.sessionStorage.setItem(
             "token",
             JSON.stringify(response.token)
           );
-          setLoadingUser(false);
-          setUserError(false);
-          setUser(response.user);
-          setToken(response.token);
         })
         .catch((err) => {
           window.sessionStorage.removeItem("user");
@@ -40,6 +40,7 @@ export default function useUser() {
   }, [setUser, setToken]);
 
   return {
+    token,
     userLogged: Boolean(token),
     user,
     loadingUser,
