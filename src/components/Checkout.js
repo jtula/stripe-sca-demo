@@ -30,10 +30,11 @@ const cardStyle = {
 export default function CheckoutForm() {
   const { token } = useUser();
   const [error, setError] = useState(null);
+  const [successful, setSuccessful] = useState(false);
   const [processing, setProcessing] = useState("");
   const [disabled, setDisabled] = useState(true);
   const [userCards, setUserCards] = useState([]);
-  const [cardSelected, setCardSelected] = useState("");
+  const [cardSelected, setCardSelected] = useState("empty");
   const [saveCard, setSaveCard] = useState(false);
   const stripe = useStripe();
   const elements = useElements();
@@ -45,12 +46,16 @@ export default function CheckoutForm() {
   const handleChange = async (event) => {
     // Listen for changes in the CardElement
     // and display any errors as the customer types their card details
+    if (successful) setSuccessful(false);
     setDisabled(event.empty);
     setError(event.error ? event.error.message : "");
   };
 
   const handleCards = (e) => {
     setCardSelected(e.target.value);
+    if (error) setError("");
+    if (successful) setSuccessful(false);
+    if (e.target.value !== "empty") setDisabled(false);
   };
 
   const handleSubmit = async (ev) => {
@@ -58,39 +63,52 @@ export default function CheckoutForm() {
     setProcessing(true);
 
     try {
-      await stripe
-        .createPaymentMethod({
+      let payload;
+      let paymentMethodId;
+      let stripeError;
+      let off_session = false;
+
+      if (cardSelected === "empty") {
+        const { paymentMethod, error } = await stripe.createPaymentMethod({
           type: "card",
           card: elements.getElement(CardElement),
-        })
-        .then(async ({ paymentMethod, error }) => {
-          if (!error) {
-            const paymentMethodId = paymentMethod.id;
-
-            const payload = {
-              paymentMethodId,
-              amount: 20,
-              saveCard,
-              off_session: false,
-            };
-
-            await buy(token, payload)
-              .then((response) => {
-                if (response.status < 300) {
-                  elements.getElement(CardElement).clear();
-                }
-              })
-              .catch(({ response }) => {
-                const errorData = response.data;
-                const code = errorData.code || errorData.message;
-                const declineCode =
-                  errorData.decline_code || "Something wrong happen!";
-                const message = `${code} ${declineCode}`;
-                setError(message);
-              });
-            setProcessing(false);
-          }
         });
+        if (!error) {
+          paymentMethodId = paymentMethod.id;
+        } else {
+          stripeError = error;
+          setError(`Payment failed:  ${error.message}`);
+        }
+      } else {
+        paymentMethodId = cardSelected;
+        off_session = true;
+      }
+
+      if (!stripeError && paymentMethodId) {
+        payload = {
+          paymentMethodId,
+          amount: 20,
+          saveCard,
+          off_session,
+        };
+
+        await buy(token, payload)
+          .then((response) => {
+            if (response.status < 300 && cardSelected === "empty") {
+              elements.getElement(CardElement).clear();
+            }
+            setSuccessful(true);
+          })
+          .catch(({ response }) => {
+            const errorData = response.data;
+            const code = errorData.code || errorData.message;
+            const declineCode =
+              errorData.decline_code || "Something wrong happen!";
+            const message = `${code} ${declineCode}`;
+            setError(message);
+          });
+        setProcessing(false);
+      }
     } catch (e) {
       setError(`Payment failed: ${e.message}`);
       setProcessing(false);
@@ -108,29 +126,35 @@ export default function CheckoutForm() {
           />
         </div>
       )}
-      {stripe && elements && (
-        <CardElement
-          id="card-element"
-          options={cardStyle}
-          onChange={handleChange}
-          className="mt-2"
-        />
+      {stripe && elements && cardSelected === "empty" && (
+        <div className="mt-4">
+          <CardElement
+            id="card-element"
+            options={cardStyle}
+            onChange={handleChange}
+            className="mt-2"
+          />
+          <div className="mt-3">
+            <input
+              id="save-card"
+              onChange={() => setSaveCard((prev) => !prev)}
+              checked={saveCard}
+              type="checkbox"
+            />
+            <label className="mx-2" htmlFor="save-card-boolean">
+              Save card
+            </label>
+            {saveCard && (
+              <input name="fullname" placeholder="Enter card name.." />
+            )}
+          </div>
+        </div>
       )}
-      <div className="mt-3">
-        <input
-          id="save-card"
-          onChange={() => setSaveCard((prev) => !prev)}
-          checked={saveCard}
-          type="checkbox"
-        />
-        <label className="mx-2" htmlFor="save-card-boolean">
-          Save card
-        </label>
-        {saveCard && <input name="fullname" placeholder="Enter card name.." />}
-      </div>
       <div className="d-flex justify-content-center">
         <button
-          className="btn btn-primary mt-2 text-center"
+          className={`btn ${
+            disabled ? "btn-secondary " : "btn-primary "
+          }mt-2 text-center`}
           disabled={processing || disabled}
           id="submit"
         >
@@ -150,9 +174,9 @@ export default function CheckoutForm() {
           {error}
         </div>
       )}
-      {userCards && (
+      {successful && (
         <div className="alert alert-primary mt-4" role="alert">
-          {JSON.stringify(userCards)}
+          Successful payment
         </div>
       )}
     </form>
