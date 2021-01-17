@@ -19,5 +19,5 @@ export const getCustomerCards = ({ token }) => {
         "Content-Type": "application/json",
       },
     })
-    .then((response) => response);
+    .then((response) => response.data.data);
 };
