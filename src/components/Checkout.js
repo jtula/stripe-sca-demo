@@ -100,11 +100,13 @@ export default function CheckoutForm() {
   return (
     <form id="payment-form" onSubmit={handleSubmit}>
       {userCards.length > 0 && (
-        <CardSelect
-          cards={userCards}
-          cardSelected={cardSelected}
-          handleCards={handleCards}
-        />
+        <div className="mb-3">
+          <CardSelect
+            cards={userCards}
+            cardSelected={cardSelected}
+            handleCards={handleCards}
+          />
+        </div>
       )}
       {stripe && elements && (
         <CardElement
