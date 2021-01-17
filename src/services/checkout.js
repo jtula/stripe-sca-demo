@@ -1,17 +1,13 @@
 import axios from "src/utils/axios";
 
-export const buy = ({ paymentMethodId, amount, token }) => {
+export const buy = (token, params) => {
   return axios
-    .post(
-      "/checkout",
-      { paymentMethodId, amount },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      }
-    )
+    .post("/checkout", params, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    })
     .then((response) => response);
 };
 
